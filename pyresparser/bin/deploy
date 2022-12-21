@@ -5,6 +5,7 @@ scriptpath=$(dirname "$0")
 cd $scriptpath/..
 
 python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 mkdir .nltk
 python setup.py
