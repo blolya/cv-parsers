@@ -1,0 +1,1 @@
+export AFFINDA_TOKEN=ed0c28ff3cf98b8056ee54538892e01cbad95ebc
