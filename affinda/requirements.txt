@@ -1,1 +1,3 @@
 affinda
+pandas
+openpyxl
