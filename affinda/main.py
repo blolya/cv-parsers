@@ -12,22 +12,25 @@ client = AffindaAPI(credential=credential)
 input_dir = os.environ['INPUT_DIR']
 output_dir = os.environ['OUTPUT_DIR'] + "/affinda"
 
-input_files = []
-exts = ["*.pdf", "*.docx"]
-for ext in exts:
-    input_files.append( glob.glob(os.path.join(input_dir, ext)) )
+# Read file names from input dir and filter by extensions
+input_files = glob.glob(input_dir + "/*")
+exts = [".pdf", ".docx"]
+input_files = list( filter(lambda f: Path(f).suffix in exts, input_files) ) \
+    if len(exts) > 0 \
+    else input_files
 
-input_files = [item for sublist in input_files for item in sublist]
 resumes = []
 for input_file in input_files:
-    print(input_file)
+    print(f"Parsing: {input_file}")
+
     input_path = Path(input_file)
 
     with open(input_path, "rb") as f:
-        resume_raw = client.create_resume(file=f)
+        raw_resume = client.create_resume(file=f)
 
-    resume = resume_raw.as_dict()
-    output_file = os.path.join(output_dir, input_path.stem + ".json")
+    resume = raw_resume.as_dict()
+
+    output_file = os.path.join(output_dir, f"{input_path.stem}.json")
     with open(output_file, "w") as f:
         f.write(json.dumps(resume))
 
@@ -35,41 +38,55 @@ for input_file in input_files:
 
 rows_list = []
 for resume in resumes:
-    print(resume)
-    data = resume.get("data")
+    data = resume["data"]
 
-    name = data.get("name").get("raw")
-    date_of_birth = data.get("date_of_birth")
+    name = data["name"]["raw"] if "name" in data else "No name"
+    date_of_birth = data.get("date_of_birth", "No date of birth")
     
-    location = data.get("location").get("raw_input") if data.get("location") else ""
-    phones = "; ".join(data.get("phone_numbers"))
-    emails = "; ".join(data.get("emails"))
-    websites = "; ".join(data.get("websites"))
+    location = data["location"]["raw_input"] if "location" in data else "No address"
+    phones = "; ".join( data.get("phone_numbers", ["No phone"]) ) 
+    emails = "; ".join( data.get("emails", ["No email"]) )
+    websites = "; ".join( data.get("websites", ["No website"]) )
 
-    summary = data.get("summary")
+    summary = data.get("summary", "No summary")
 
-    languages = "; ".join(data.get("languages"))
+    languages = "; ".join( data.get("languages", "No languages") )
 
     def create_education(e):
-        return ", ".join([
-            "date: " + e.get("dates").get("completion_date") if e.get("dates") else "",
-            "organization: " + e.get("organization"), 
-            "accreditation: " + e.get("accreditation").get("education")
-        ])
-    education = "; ".join( map(create_education, data.get("education")) )
+        dates = e.get("dates", {})
+        completion_date = dates.get("completion_date", "No completion date") 
 
-    profession = data.get("profession")
+        organization = e.get("organization", "No organization")
+
+        accreditation = e.get("accreditation", {})
+        education = accreditation.get("education", "No accreditation")
+        return ", ".join([
+            f"date: {completion_date}",
+            f"organization: {organization}", 
+            f"accreditation: {education}"
+        ])
+    education = "; ".join( map(create_education, data["education"]) ) if "education" in data else "No education"
+
+    profession = data.get("profession", "No profession")
 
     def create_work_experience(we):
-        return ", ".join([
-            "dates: " + we.get("dates").get("start_date") + "/" + we.get("dates").get("end_date"),
-            "organization: " + we.get("organization"),
-            "job title: " + we.get("job_title"),
-            "job description: " + we.get("job_description")
-        ])
-    work_experience = "; ".join( map(create_work_experience, data.get("work_experience")) )
+        dates = we.get("dates", {})
+        start_date = dates.get("start_date", "No start date")
+        end_date = dates.get("end_date", "No end date")
 
-    skills = "; ".join( map(lambda s: s.get("name"), data.get("skills")) )
+        organization = we.get("organization", "No organization")
+        job_title = we.get("job_title", "No job title")
+        job_description = we.get("job_description", "No job description")
+
+        return ", ".join([
+            f"dates: {start_date}/{end_date}",
+            f"organization: {organization}",
+            f"job title: {job_title}",
+            f"job description: {job_description}"
+        ])
+    work_experience = "; ".join( map(create_work_experience, data["work_experience"]) ) if "work_experience" in data else "No work experience"
+
+    skills = "; ".join( map(lambda s: s.get("name"), data["skills"]) ) if "skills" in data else "No skills"
 
     rows_list.append({
         "name": name, "date_of_birth": date_of_birth, "location": location, "phones": phones,
