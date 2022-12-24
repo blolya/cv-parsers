@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+scriptpath=$(dirname "$0")
+cd $scriptpath/..
+
+source .venv/bin/activate
+
+export NLTK_DATA=$scriptpath/../.nltk
+
+python $1 
