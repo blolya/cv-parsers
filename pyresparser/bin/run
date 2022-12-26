@@ -8,4 +8,4 @@ source .venv/bin/activate
 
 export NLTK_DATA=$scriptpath/../.nltk
 
-python $1 
+python $1 -id /home/blolya/Documents/cv-parser/input -od /home/blolya/Documents/cv-parser/output/pyresparser -e ".pdf" ".docx"

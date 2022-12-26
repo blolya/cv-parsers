@@ -1,3 +1,5 @@
 nltk
 spacy==2.3.9
 pyresparser
+pandas
+openpyxl
