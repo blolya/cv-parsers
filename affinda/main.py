@@ -34,16 +34,17 @@ for input_file in input_files:
     with open(output_file, "w") as f:
         f.write(json.dumps(resume))
 
+    resume["file"] = input_file
     resumes.append(resume)    
 
 rows_list = []
 for resume in resumes:
-    data = resume["data"]
+    data = resume.get("data", {})
 
-    name = data["name"]["raw"] if "name" in data else "No name"
+    name = data.get("name", {}).get("raw", "No name")
     date_of_birth = data.get("date_of_birth", "No date of birth")
     
-    location = data["location"]["raw_input"] if "location" in data else "No address"
+    location = data.get("location", {}).get("raw_input", "No address")
     phones = "; ".join( data.get("phone_numbers", ["No phone"]) ) 
     emails = "; ".join( data.get("emails", ["No email"]) )
     websites = "; ".join( data.get("websites", ["No website"]) )
@@ -53,19 +54,15 @@ for resume in resumes:
     languages = "; ".join( data.get("languages", "No languages") )
 
     def create_education(e):
-        dates = e.get("dates", {})
-        completion_date = dates.get("completion_date", "No completion date") 
-
+        completion_date = e.get("dates", {}).get("completion_date", "No completion date") 
         organization = e.get("organization", "No organization")
-
-        accreditation = e.get("accreditation", {})
-        education = accreditation.get("education", "No accreditation")
+        education = e.get("accreditation", {}).get("education", "No accreditation")
         return ", ".join([
             f"date: {completion_date}",
             f"organization: {organization}", 
             f"accreditation: {education}"
         ])
-    education = "; ".join( map(create_education, data["education"]) ) if "education" in data else "No education"
+    education = "; ".join( map(create_education, data.get("education", [])) )
 
     profession = data.get("profession", "No profession")
 
@@ -84,7 +81,7 @@ for resume in resumes:
             f"job title: {job_title}",
             f"job description: {job_description}"
         ])
-    work_experience = "; ".join( map(create_work_experience, data["work_experience"]) ) if "work_experience" in data else "No work experience"
+    work_experience = "; ".join( map(create_work_experience, data.get("work_experience", [])) )
 
     skills = "; ".join( map(lambda s: s.get("name"), data["skills"]) ) if "skills" in data else "No skills"
 
@@ -92,13 +89,9 @@ for resume in resumes:
         "name": name, "date_of_birth": date_of_birth, "location": location, "phones": phones,
         "emails": emails, "websites": websites, "summary": summary,
         "languages": languages, "education": education, "profession": profession,
-        "work_experience": work_experience, "skills": skills
+        "work_experience": work_experience, "skills": skills, "file": resume["file"]
     })
 
-columns = ["name", "date_of_birth", "location", "phones",
-           "emails", "websites", "summary",
-           "languages", "education", "profession", 
-           "work_experience", "skills"]
-df = pd.DataFrame(rows_list, columns = columns)
+df = pd.DataFrame(rows_list)
 
 df.to_excel(output_dir + "/resumes.xlsx")
