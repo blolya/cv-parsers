@@ -92,7 +92,7 @@ for resume in resumes:
 
     languages = "; ".join( map( lambda lc: lc.get("Language", ""), resume.get("LanguageCompetencies", {})) )
 
-    education = "; ".join( map( lambda e: e.get("Text", ""), resume.get("EducationDetails", {})) )
+    education = "; ".join( map( lambda e: e.get("Text", ""), resume.get("Education", {}).get("EducationDetails", {})) )
 
     employment_history = resume.get("EmploymentHistory", {})
     experience_summary = employment_history.get("ExperienceSummary", {}).get("Description", "No experience summary")
@@ -113,13 +113,13 @@ for resume in resumes:
         ])
     work_experience = "; ".join( map(create_work_experience, employment_history.get("Positions", [])) )
 
-    skills = "; ".join( map(lambda s: s.get("Name"), resume.get("skills", {}).get("Raw", [])) )
+    skills = "; ".join( map(lambda s: s.get("Name"), resume.get("Skills", {}).get("Raw", [])) )
     certifications = "; ".join( map(lambda s: s.get("Name"), resume.get("Certifications", [])) )
 
     rows_list.append({
         "name": name, "date_of_birth": date_of_birth, "location": location, "phones": phones,
         "emails": emails, "websites": websites, "summary": summary, "languages": languages,
-        "education": education, "profession": experience_summary, "work_experience": work_experience, "skills": skills,
+        "education": education, "experience_summary": experience_summary, "work_experience": work_experience, "skills": skills,
         "certifications": certifications, "file": resume.get("file", "")
     })
 
