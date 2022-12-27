@@ -2,6 +2,7 @@ import os
 import argparse
 import glob
 import json
+import datetime
 from pathlib import Path
 from pyresparser import ResumeParser
 import pandas as pd
@@ -29,7 +30,9 @@ input_files = list( filter(lambda f: Path(f).suffix in exts, input_files) ) \
     else input_files
 
 resumes = []
+start_time = datetime.now()
 for input_file in input_files:
+    print(f"Parsing: {input_file}")
     resume = ResumeParser(input_file).get_extracted_data()
     
     # removing keys with None value
@@ -45,6 +48,7 @@ for input_file in input_files:
         f.close()
 
     resumes.append(resume)
+print(f"Parsed {len(input_files)} files in {datetime.now() - start_time}")
 
 rows_list = []
 for resume in resumes:
