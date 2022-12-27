@@ -2,7 +2,7 @@ import os
 import glob
 import json
 import argparse
-import datetime
+from datetime import datetime
 from pathlib import Path
 from affinda import AffindaAPI, TokenCredential
 import pandas as pd

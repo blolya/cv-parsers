@@ -3,8 +3,8 @@ import argparse
 import requests
 import json
 import os.path
-import datetime
 import glob
+from datetime import datetime
 import pandas as pd
 from pathlib import Path
 

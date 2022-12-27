@@ -2,7 +2,7 @@ import os
 import argparse
 import glob
 import json
-import datetime
+from datetime import datetime
 from pathlib import Path
 from pyresparser import ResumeParser
 import pandas as pd
