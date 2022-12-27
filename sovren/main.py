@@ -31,7 +31,7 @@ def parse_resume(file, account_id, token):
         base64str = base64.b64encode(f.read()).decode('UTF-8')
  
     epoch_seconds = os.path.getmtime(file)
-    last_modified_date = datetime.datetime.fromtimestamp(epoch_seconds).strftime("%Y-%m-%d") 
+    last_modified_date = datetime.fromtimestamp(epoch_seconds).strftime("%Y-%m-%d") 
  
     url = "https://eu-rest.resumeparsing.com/v10/parser/resume"
     payload = {
