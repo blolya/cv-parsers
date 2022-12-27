@@ -26,7 +26,6 @@ if output_dir is None:
 
 # Read file names from input dir and filter by extensions
 input_files = glob.glob(input_dir + "/*")
-exts = [".pdf", ".docx"]
 input_files = list( filter(lambda f: Path(f).suffix in exts, input_files) ) \
     if len(exts) > 0 \
     else input_files
