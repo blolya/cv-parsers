@@ -1,16 +1,28 @@
 import os
 import glob
 import json
-import pandas as pd
+import argparse
+import datetime
 from pathlib import Path
 from affinda import AffindaAPI, TokenCredential
+import pandas as pd
 
-token = os.environ['AFFINDA_TOKEN']
-credential = TokenCredential(token=token)
-client = AffindaAPI(credential=credential)
+arg_parser = argparse.ArgumentParser(prog="Affinda parser", description="Parsing resumes using affinda service")
+arg_parser.add_argument("-id", "--input_dir", help="Input directory of resume files")
+arg_parser.add_argument("-od", "--output_dir", help="Output directory of resume files")
+arg_parser.add_argument("-e", "--exts", nargs='+', help="Extensions to parse. All if empty.")
+args = arg_parser.parse_args()
 
-input_dir = os.environ['INPUT_DIR']
-output_dir = os.environ['OUTPUT_DIR'] + "/affinda"
+input_dir = args.input_dir
+output_dir = args.output_dir
+exts = args.exts
+
+if input_dir is None:
+    arg_parser.print_help()
+    raise Exception("Must specify input directory of the resumes")
+if output_dir is None:
+    arg_parser.print_help()
+    raise Exception("Must specify output directory of the resumes")
 
 # Read file names from input dir and filter by extensions
 input_files = glob.glob(input_dir + "/*")
@@ -19,7 +31,12 @@ input_files = list( filter(lambda f: Path(f).suffix in exts, input_files) ) \
     if len(exts) > 0 \
     else input_files
 
+token = os.environ['AFFINDA_TOKEN']
+credential = TokenCredential(token=token)
+client = AffindaAPI(credential=credential)
+
 resumes = []
+start_time = datetime.now()
 for input_file in input_files:
     print(f"Parsing: {input_file}")
 
@@ -36,6 +53,7 @@ for input_file in input_files:
 
     resume["file"] = input_file
     resumes.append(resume)    
+print(f"Parsed {len(input_files)} files in {datetime.now() - start_time}")
 
 rows_list = []
 for resume in resumes:
@@ -93,5 +111,4 @@ for resume in resumes:
     })
 
 df = pd.DataFrame(rows_list)
-
 df.to_excel(output_dir + "/resumes.xlsx")

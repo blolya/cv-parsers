@@ -7,4 +7,4 @@ cd $scriptpath/..
 source .venv/bin/activate
 source env/environments.sh
 
-python $1
+python $1 -id /home/blolya/Documents/cv-parser/input -od /home/blolya/Documents/cv-parser/output/affinda -e ".pdf" ".docx"
