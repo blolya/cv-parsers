@@ -47,6 +47,7 @@ for input_file in input_files:
         f.write(json.dumps(resume))
         f.close()
 
+    resume["file"] = input_file
     resumes.append(resume)
 print(f"Parsed {len(input_files)} files in {datetime.now() - start_time}")
 
@@ -69,7 +70,7 @@ for resume in resumes:
     rows_list.append({
         "name": name, "phone": phone, "email": email, "skills": skills,
         "education": education, "profession": designation, "work_experience": experience,
-        "companies": companies
+        "companies": companies, "file": resume["file"]
     })
 
 df = pd.DataFrame(rows_list)
