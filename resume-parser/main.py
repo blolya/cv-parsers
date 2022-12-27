@@ -32,6 +32,7 @@ input_files = list( filter(lambda f: Path(f).suffix in exts, input_files) ) \
 resumes = []
 start_time = datetime.now()
 for input_file in input_files:
+    print(f"Parsing: {input_file}")
     resume = resumeparse.read_file(input_file)
 
     input_path = Path(input_file)
