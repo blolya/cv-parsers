@@ -58,7 +58,9 @@ account_id = os.environ['SOVREN_ACCOUNT_ID']
 token = os.environ['SOVREN_TOKEN']
 
 resumes = []
+start_time = datetime.now()
 for input_file in input_files:
+    print(f"Parsing: {input_file}")
     json_resume = parse_resume(input_file, account_id, token)
 
     input_path = Path(input_file)
@@ -71,6 +73,7 @@ for input_file in input_files:
     resume = resume_data['Value']['ResumeData']
     resume["file"] = input_file
     resumes.append(resume)
+print(f"Parsed {len(input_files)} files in {datetime.now() - start_time}")
 
 rows_list = []
 for resume in resumes:
